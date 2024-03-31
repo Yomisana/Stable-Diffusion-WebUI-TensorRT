@@ -14,7 +14,7 @@ def merge_loras(loras: List[str], scales: List[str]) -> dict:
     lora_names = [os.path.splitext(os.path.basename(lora))[0] for lora in loras] # only output the file name
     for lora, scale, lora_name in zip(loras, scales, lora_names):
         lora_dict = load_file(lora)
-        with tqdm(total=len(lora_dict), desc=f" > Loading '{lora_name}' LoRA") as pbar:
+        with tqdm(total=len(lora_dict), desc=f" > Loading '{lora_name}' LoRA", mininterval=1) as pbar:
             for k, v in lora_dict.items():
                 if k in refit_dict:
                     refit_dict[k] += scale * v
@@ -39,7 +39,7 @@ def apply_loras(base_path: str, loras: List[str], scales: List[str]) -> dict:
             return np.array([np.int32(arr)])
         return arr
     total_initializers = sum(1 for initializer in base.graph.initializer if initializer.name in refit_dict)
-    with tqdm(total=total_initializers, desc="Updating weights") as pbar:
+    with tqdm(total=total_initializers, desc="Updating weights", mininterval=1) as pbar:
         for initializer in base.graph.initializer:
             if initializer.name not in refit_dict:
                 continue
