@@ -153,7 +153,7 @@ def export_unet_to_trt(
 
     gc.collect()
     torch.cuda.empty_cache()
-
+    print("[TensorRT] Exported Successfully")
     return "## Exported Successfully \n"
 
 
@@ -224,7 +224,7 @@ def export_lora_to_trt(lora_name, force_export):
 
     if os.path.exists(lora_trt_path) and not force_export:
         print(
-            "TensorRT engine found. Skipping build. You can enable Force Export in the Advanced Settings to force a rebuild if needed."
+            "[TensorRT] engine found. Skipping build. You can enable Force Export in the Advanced Settings to force a rebuild if needed."
         )
         return "## Exported Successfully \n"
 
@@ -239,7 +239,7 @@ def export_lora_to_trt(lora_name, force_export):
 
     save_file(refit_dict, lora_trt_path)
 
-
+    print("[TensorRT] Exported Successfully")
     return "## Exported Successfully \n"
 
 
