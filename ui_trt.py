@@ -268,7 +268,7 @@ def get_lora_checkpoints():
         _filename, ext = os.path.splitext(filename)
         # name = os.path.normpath(_filename)
         name = os.path.basename(os.path.normpath(_filename))
-        config_file = os.path.join(cmd_opts.lora_dir, name + ".json")
+        config_file = os.path.join(cmd_opts.lora_dir, os.path.normpath(_filename) + ".json")
         if ext == ".safetensors":
             metadata = sd_models.read_metadata_from_safetensors(
                 os.path.join(cmd_opts.lora_dir, filename)
