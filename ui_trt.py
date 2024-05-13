@@ -236,7 +236,6 @@ def export_lora_to_trt(lora_name, force_export):
         lora_model["filename"],
         profile_settings,
     )
-
     save_file(refit_dict, lora_trt_path)
 
     print("[TensorRT] Exported Successfully")
@@ -257,26 +256,28 @@ def get_version_from_filename(name):
 def get_lora_checkpoints():
     available_lora_models = {}
     allowed_extensions = ["pt", "ckpt", "safetensors"]
-    candidates = [
-        p
-        for p in os.listdir(cmd_opts.lora_dir)
-        if p.split(".")[-1] in allowed_extensions
-    ]
+    candidates = []
+    for root, dirs, files in os.walk(cmd_opts.lora_dir):
+        relative_root = os.path.relpath(root, cmd_opts.lora_dir)
+        for file in files:
+            if file.split(".")[-1] in allowed_extensions:
+                candidates.append(os.path.join(relative_root, file))
 
     for filename in candidates:
         metadata = {}
-        name, ext = os.path.splitext(filename)
+        _filename, ext = os.path.splitext(filename)
+        # name = os.path.normpath(_filename)
+        name = os.path.basename(os.path.normpath(_filename))
         config_file = os.path.join(cmd_opts.lora_dir, name + ".json")
-
         if ext == ".safetensors":
             metadata = sd_models.read_metadata_from_safetensors(
                 os.path.join(cmd_opts.lora_dir, filename)
             )
         else:
             print(
-                """LoRA {} is not a safetensor. This might cause issues when exporting to TensorRT.
-                   Please ensure that the correct base model is selected when exporting.""".format(
-                    name
+                """LoRA folder {} is not a safetensor. This might cause issues when exporting to TensorRT.
+                Please ensure that the correct base model is selected when exporting.""".format(
+                    filename 
                 )
             )
 
@@ -292,13 +293,13 @@ def get_lora_checkpoints():
         else:
             version = SDVersion.Unknown
             print(
-                "No config file found for {}. You can generate it in the LoRA tab.".format(
-                    name
+                "No LoRA config file found for {}. You can generate it in the LoRA tab.".format(
+                    filename
                 )
             )
-
+        # print(f"{filename} LoRA model: {name} | {version} | {base_model}")
         available_lora_models[name] = {
-            "filename": filename,
+            "filename": name,
             "version": version,
             "base_model": base_model,
         }
